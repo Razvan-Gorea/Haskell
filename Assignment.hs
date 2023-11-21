@@ -12,28 +12,42 @@ data Tree t =
 -- Otherwise it adds the node as another root, the 2 roots then create three children nil nodes
 -- Future nodes then are added to the tree by comparing the node to the roots, deteriming its position in the tree, and the number of children nodes
 add :: Ord t => t -> Tree t -> Tree t
+-- Adding a node to an empty 2-3 Tree
 add a Nil = Node2 a Nil Nil
-add x (Node2 a left right)  
+add x (Node2 a left right) 
+-- If the node is less than or equal to the root node, then the node is added to the left of the root node
    | x <= a = Node3 x a Nil Nil Nil
+-- Else add to the right of the root node
    | otherwise = Node3 a x Nil Nil Nil
 add x (Node3 a b left middle right)
+-- If the node is less than or equal to the first root node, then the node is added to the left of the 2 root nodes
    | x <= a = Node3 a b (add x left) middle right
+-- If the node is greater than the first root node and less than or equal to the second root node, then the node is added to the middle of the 2 root nodes
    | x > a && x <= b = Node3 a b left (add x middle) right
+-- Else the node is added to the right of the 2 root nodes
    | otherwise = Node3 a b left middle (add x right)
 
 
 -- Member function that checks if a node is in the 2-3 tree
 -- The member function recursively goes through the tree, left most as possible, until it finds the node
 member :: (Ord t) => t -> Tree t -> Bool
+-- If the tree is empty, the node can't be in the tree, hence false
 member _ Nil = False
 member x (Node2 a left right)
+-- If the node is equal to the root node, then the node is in the tree
    | x == a = True
+-- If the node is less than the root node, then check the left side of the tree for the node
    | x <= a = member x left
+-- Else check the right side of the tree for the node
    | otherwise = member x right
 member x (Node3 a b left middle right)
+-- If the node is equal to any of the 2 root nodes, then the node is in the tree
    | x == a || x == b = True
+-- If the node is less than the first root node, then check the left side of the tree for the node
    | x <= a = member x left
+-- If the node is greater than the first root node and less than or equal to the second root node, then check the middle side of the tree for the node
    | x > a && x <= b = member x middle
+-- Else check the right side of the tree for the node
    | otherwise = member x right
 
 
@@ -52,16 +66,25 @@ makeTree [] = Nil
 makeTree (x:xs) = add x (makeTree xs)
 
 
--- Unsure if correct???
+-- My Implementation of a pretty print function
+-- Not the best, since I couldn't figure out how to format the way I wanted to.
+-- The problem occured when I tried to change one niche aspect of the formatt, it would break other things in the process
+-- I Might look into solving it in the future
 prettyPrint :: Show t => Tree t -> String
 prettyPrint tree = prettyPrint' tree 0
 
 prettyPrint' :: Show t => Tree t -> Int -> String
 prettyPrint' Nil _ = "Nil"
 prettyPrint' (Node2 a left right) count = replicate count ' ' ++ show a ++ " [" ++ prettyPrint' left (count + 2) ++ ", " ++ prettyPrint' right (count + 2) ++ "]"
-prettyPrint' (Node3 a b left middle right) count = replicate count ' ' ++ show a ++ "," ++ show b ++ "\n" ++ replicate (count + 4) ' ' ++ "|---->" ++ prettyPrint' left (count + 6) ++ "\n" ++ replicate (count + 4) ' ' ++ "|---->" ++ prettyPrint' middle (count + 6) ++ "\n" ++ replicate (count + 4) ' ' ++ "|---->" ++ prettyPrint' right (count + 6)
+prettyPrint' (Node3 a b left middle right) count = replicate count ' ' ++ show a ++ "," ++ show b ++ "\n" ++ replicate (count + 4) ' ' ++ "|---->" ++ prettyPrint' left (count + 0) ++ "\n" ++ replicate (count + 4) ' ' ++ "|---->" ++ prettyPrint' middle (count + 6) ++ "\n" ++ replicate (count + 4) ' ' ++ "|---->" ++ prettyPrint' right (count + 6)
 
+{-
+Comment the following section in to test add, prettyPrint, member and height functions
+A 2-3 tree called tree7 is created by adding a bunch of numbers repeatedly to the tree, over and over again
 
+-}
+
+{-
 main :: IO()
 main = 
    do
@@ -73,14 +96,8 @@ main =
       let tree5 = add 6 tree4
       let tree6 = add 7 tree5
       let tree7 = add 8 tree6
+      print(member 3 tree7)
+      print(member 9 tree7)
+      print(height tree7)
       putStrLn(prettyPrint tree7)
-{-
-
-Questions:
-
-1. What happens when you use the add method to add a node to an empty tree?
-2. If the height method is presented with an empty tree, should it return 0, -1 or 1?
-3. How to pretty print?
-4. Add Method? is less that or equal to correct? or should it just be less than?
-
 -}

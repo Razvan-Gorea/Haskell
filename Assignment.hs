@@ -54,9 +54,9 @@ makeTree (x:xs) = add x (makeTree xs)
 
 -- Unsure if correct???
 prettyPrint :: Show t => Tree t -> String
-prettyPrint Nil = ""
-prettyPrint (Node2 a left right) = prettyPrint left ++ show a ++ prettyPrint right
-prettyPrint (Node3 a b left middle right) = prettyPrint left ++ show a ++ prettyPrint middle ++ show b ++ prettyPrint right
+prettyPrint Nil = "Nil"
+prettyPrint (Node2 a left right) = "           " ++ show a ++ show left ++ show right ++ "           "
+prettyPrint (Node3 a b left middle right) = "                            " ++ show a ++ "," ++ show b ++ "\n" ++ prettyPrint left ++ prettyPrint middle ++ prettyPrint right
 
 
 main :: IO()
@@ -66,7 +66,7 @@ main =
       let tree1 = add 2 tree
       let tree2 = add 1 tree1
       let tree3 = add 4 tree2
-      print(prettyPrint tree3)
+      putStrLn(prettyPrint tree3)
 {-
 
 Questions:
